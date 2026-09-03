@@ -34,8 +34,129 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 
-  <!-- Custom Stylesheet -->
-  <link rel="stylesheet" href="/static/css/customizer.css">
+  <!-- Tailwind CSS via CDN with bespoke configuration -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            aura: {
+              bg: '#0C0E12',
+              surface: '#12151E',
+              elevated: '#181D29',
+              border: '#232733',
+              lime: '#A3E635',
+              'lime-hover': '#B7F04E',
+              text: '#E4E4E7',
+              muted: '#8C92A0',
+            }
+          },
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'system-ui', '-apple-system', 'sans-serif'],
+            serif: ['"Lora"', 'Georgia', 'serif'],
+            mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
+          }
+        }
+      }
+    };
+  </script>
+
+  <!-- Bespoke CSS styles -->
+  <style>
+    :root {
+      --bg-main: #0C0E12;
+      --bg-surface: #12151E;
+      --bg-elevated: #181D29;
+      --border-subtle: #232733;
+      --border-focus: #2E384D;
+      --accent-lime: #A3E635;
+      --accent-lime-hover: #B7F04E;
+      --text-primary: #FFFFFF;
+      --text-muted: #8C92A0;
+    }
+
+    body {
+      background-color: #0C0E12;
+      color: #E4E4E7;
+      font-family: "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Custom Scrollbars */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #0C0E12;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #232733;
+      border-radius: 9999px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #323849;
+    }
+
+    /* Range input customization */
+    input[type="range"] {
+      -webkit-appearance: none;
+      background: #1C212E;
+      height: 6px;
+      border-radius: 9999px;
+      outline: none;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      height: 16px;
+      width: 16px;
+      border-radius: 50%;
+      background: #A3E635;
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(163, 230, 53, 0.4);
+      transition: transform 0.1s ease;
+    }
+
+    input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.2);
+    }
+
+    /* Animated Shimmer for Loaders */
+    @keyframes auraShimmer {
+      0% {
+        background-position: -200% 0;
+      }
+      100% {
+        background-position: 200% 0;
+      }
+    }
+
+    .aura-skeleton {
+      background: linear-gradient(90deg, #161A24 25%, #222838 50%, #161A24 75%);
+      background-size: 200% 100%;
+      animation: auraShimmer 1.8s infinite;
+    }
+
+    /* Drag over highlight */
+    .drag-active {
+      border-color: #A3E635 !important;
+      background-color: rgba(163, 230, 53, 0.08) !important;
+    }
+
+    /* Responsive fixes down to 320px */
+    @media (max-width: 640px) {
+      select, input, button {
+        font-size: 14px !important;
+      }
+    }
+  </style>
 
   <!-- Structured JSON-LD Data -->
   <script type="application/ld+json">

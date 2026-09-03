@@ -1,9 +1,5 @@
 /* Aura High-Performance Customizer Stylesheet */
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
 :root {
   --bg-main: #0C0E12;
   --bg-surface: #12151E;
@@ -14,6 +10,14 @@
   --accent-lime-hover: #B7F04E;
   --text-primary: #FFFFFF;
   --text-muted: #8C92A0;
+}
+
+body {
+  background-color: #0C0E12;
+  color: #E4E4E7;
+  font-family: "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
+  margin: 0;
+  padding: 0;
 }
 
 /* Custom Scrollbars */
@@ -41,6 +45,7 @@ input[type="range"] {
   background: #1C212E;
   height: 6px;
   border-radius: 9999px;
+  outline: none;
 }
 
 input[type="range"]::-webkit-slider-thumb {
@@ -72,12 +77,6 @@ input[type="range"]::-webkit-slider-thumb:hover {
   background: linear-gradient(90deg, #161A24 25%, #222838 50%, #161A24 75%);
   background-size: 200% 100%;
   animation: auraShimmer 1.8s infinite;
-}
-
-/* Canvas Crosshair Grid */
-.canvas-grid-bg {
-  background-image: radial-gradient(#202533 1px, transparent 1px);
-  background-size: 16px 16px;
 }
 
 /* Drag over highlight */
