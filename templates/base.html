@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- Primary Meta Tags -->
+  <title>{% block title %}Aura Customizer | High-Performance Product Customization Engine{% endblock %}</title>
+  <meta name="title" content="Aura Customizer | High-Performance Product Customization Engine">
+  <meta name="description" content="Commercial-grade photorealistic product customization system. Automated perspective alignment, computer vision fabric displacement mapping, and natural lighting conformation using OpenCV and Django.">
+  <meta name="keywords" content="product customizer, opencv displacement mapping, mockup generator, fabric perspective warping, print on demand mockup, high resolution rendering, django celery">
+  <meta name="author" content="Aura Technologies">
+  <meta name="theme-color" content="#0C0E12">
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="{{ request.build_absolute_uri }}">
+  <meta property="og:title" content="Aura Customizer | High-Performance Product Customization Engine">
+  <meta property="og:description" content="Automated perspective homography, fabric fold conformation, and photometric ink blending for high-resolution apparel and lifestyle mockups.">
+  <meta property="og:image" content="https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=1200&q=80">
+
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:url" content="{{ request.build_absolute_uri }}">
+  <meta property="twitter:title" content="Aura Customizer | Photorealistic Image Processing Engine">
+  <meta property="twitter:description" content="Automated perspective homography and computer vision fabric conformation powered by Python, OpenCV, and Django.">
+  <meta property="twitter:image" content="https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=1200&q=80">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='24' fill='%230C0E12'/><path d='M30 70 L50 25 L70 70 L58 70 L50 50 L42 70 Z' fill='%23A3E635'/><circle cx='50' cy='38' r='4' fill='%23FFFFFF'/></svg>">
+
+  <!-- Google Fonts: Plus Jakarta Sans & Lora -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="/static/css/customizer.css">
+
+  <!-- Structured JSON-LD Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Aura High-Performance Product Customizer",
+    "applicationCategory": "DesignApplication",
+    "operatingSystem": "All Modern Web Browsers",
+    "offers": {
+      "@type": "Offer",
+      "price": "0.00",
+      "priceCurrency": "USD"
+    },
+    "description": "High-throughput computer vision product customization engine featuring automated 4-point perspective alignment, fabric fold displacement mapping, and photometric lighting transfer.",
+    "featureList": [
+      "Automated perspective detection and 4-point homography",
+      "Computer vision fold and wrinkle displacement mapping via Sobel gradient fields",
+      "Photometric Multiply and Overlay ink transfer blending",
+      "Celery and Redis asynchronous queue for high-resolution 2400px rendering",
+      "Interactive 2D client studio canvas with live angle switching"
+    ]
+  }
+  </script>
+  
+  {% block extra_head %}{% endblock %}
+</head>
+<body class="h-full flex flex-col bg-[#0C0E12] text-[#E4E4E7] font-sans antialiased selection:bg-[#A3E635] selection:text-[#0C0E12]">
+
+  <!-- Top Global Navigation Bar -->
+  <header class="sticky top-0 z-40 w-full border-b border-[#232730] bg-[#0C0E12]/90 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+      
+      <!-- Brand Wordmark -->
+      <a href="{% url 'customizer:studio' %}" class="flex items-center gap-2 group focus:outline-none">
+        <div class="h-8 w-8 rounded-lg bg-[#161920] border border-[#2B313E] flex items-center justify-center text-[#A3E635] font-mono font-bold text-base shadow-sm group-hover:border-[#A3E635] transition-colors">
+          Δ
+        </div>
+        <div class="flex flex-col">
+          <span class="text-base font-bold tracking-tight text-white font-sans flex items-center gap-1.5">
+            Aura <span class="text-xs font-mono font-normal text-[#A3E635] px-1.5 py-0.5 rounded bg-[#A3E635]/10 border border-[#A3E635]/20">Engine v2.4</span>
+          </span>
+        </div>
+      </a>
+
+      <!-- Desktop Nav Anchors -->
+      <nav class="hidden md:flex items-center gap-1 text-xs font-medium text-[#A1A1AA]">
+        <a href="{% url 'customizer:studio' %}" class="px-3 py-1.5 rounded-lg text-white hover:bg-[#181B23] transition-colors">
+          Customizer Studio
+        </a>
+        <a href="{% url 'customizer:catalog' %}" class="px-3 py-1.5 rounded-lg hover:text-white hover:bg-[#181B23] transition-colors">
+          Garment Catalog
+        </a>
+        <a href="#pipeline-specs" class="px-3 py-1.5 rounded-lg hover:text-white hover:bg-[#181B23] transition-colors">
+          Computer Vision Specs
+        </a>
+        <a href="/admin/" target="_blank" class="px-3 py-1.5 rounded-lg text-[#A3E635] hover:bg-[#A3E635]/10 transition-colors flex items-center gap-1">
+          <span>Admin Console</span>
+          <span class="text-[10px]">↗</span>
+        </a>
+      </nav>
+
+      <!-- Right Action Pill -->
+      <div class="flex items-center gap-2.5">
+        <div class="hidden sm:flex items-center gap-2 px-2.5 py-1 rounded-full border border-[#2A2E3B] bg-[#141720] text-[11px] font-mono text-[#A1A1AA]">
+          <span class="h-2 w-2 rounded-full bg-[#10B981] animate-pulse"></span>
+          <span>OpenCV Worker Ready</span>
+        </div>
+
+        <a href="{% url 'customizer:studio' %}" class="px-4 py-2 rounded-xl bg-[#A3E635] hover:bg-[#B7F04E] text-[#0C0E12] font-semibold text-xs tracking-tight shadow-sm transition-all transform active:scale-95">
+          Launch Studio
+        </a>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- Main Viewport Content -->
+  <main class="flex-1 flex flex-col">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Technical Specifications Footer -->
+  <footer class="border-t border-[#232730] bg-[#08090C] text-[#8C909A] text-xs transition-colors">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 mb-10">
+        
+        <!-- Brand & Engine Description -->
+        <div class="sm:col-span-2 space-y-3">
+          <div class="flex items-center gap-2 text-white font-bold text-base">
+            <span class="text-[#A3E635]">Δ</span>
+            <span>Aura Product Customization System</span>
+          </div>
+          <p class="text-xs leading-relaxed text-[#7D828D] max-w-md">
+            Commercial grade rendering pipeline combining automated 4-point homography, surface normal extraction, and photometric texture deformation for realistic print simulation.
+          </p>
+          <div class="flex flex-wrap gap-2 text-[11px] font-mono text-[#A3E635]">
+            <span class="px-2 py-0.5 rounded bg-[#161A22] border border-[#2B3242]">OpenCV 4.12</span>
+            <span class="px-2 py-0.5 rounded bg-[#161A22] border border-[#2B3242]">NumPy 2.2</span>
+            <span class="px-2 py-0.5 rounded bg-[#161A22] border border-[#2B3242]">Celery + Redis</span>
+            <span class="px-2 py-0.5 rounded bg-[#161A22] border border-[#2B3242]">Bicubic Remap</span>
+          </div>
+        </div>
+
+        <!-- Quick Links -->
+        <div class="space-y-2.5">
+          <h4 class="text-xs font-semibold uppercase tracking-wider text-white">System Navigation</h4>
+          <ul class="space-y-1.5 text-xs text-[#7D828D]">
+            <li><a href="{% url 'customizer:studio' %}" class="hover:text-white transition-colors">Interactive Studio</a></li>
+            <li><a href="{% url 'customizer:catalog' %}" class="hover:text-white transition-colors">Product Catalog</a></li>
+            <li><a href="/admin/" class="hover:text-white transition-colors">Angle & Print Bed Admin</a></li>
+            <li><a href="#pipeline-specs" class="hover:text-white transition-colors">Pipeline Architecture</a></li>
+          </ul>
+        </div>
+
+        <!-- Compliance & Legal Modals Trigger -->
+        <div class="space-y-2.5">
+          <h4 class="text-xs font-semibold uppercase tracking-wider text-white">Legal & Compliance</h4>
+          <ul class="space-y-1.5 text-xs text-[#7D828D]">
+            <li><button onclick="openLegalModal('terms')" class="hover:text-white transition-colors cursor-pointer text-left">Terms of Service</button></li>
+            <li><button onclick="openLegalModal('privacy')" class="hover:text-white transition-colors cursor-pointer text-left">Privacy & Artwork Rights</button></li>
+            <li><button onclick="openLegalModal('commercial')" class="hover:text-white transition-colors cursor-pointer text-left">Commercial Licensing</button></li>
+          </ul>
+        </div>
+
+      </div>
+
+      <!-- Copyright Bar -->
+      <div class="border-t border-[#1C2029] pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-[#636873]">
+        <p>© 2026 Aura Customizer. High-throughput image generation system. All rights reserved.</p>
+        <p class="font-mono">Engine Status: Production Ready • Max Resolution: 2400x2400px</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Legal Modal Dialog -->
+  <div id="legalModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 sm:p-6 overflow-y-auto" role="dialog" aria-modal="true">
+    <div onclick="closeLegalModal()" class="fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity"></div>
+    <div class="relative w-full max-w-2xl rounded-2xl border border-[#2B3140] bg-[#12151D] p-6 sm:p-8 shadow-2xl z-10 my-4 text-xs text-[#A1A1AA] space-y-4">
+      <div class="flex items-center justify-between border-b border-[#232733] pb-4">
+        <div>
+          <h3 id="legalModalTitle" class="text-base sm:text-lg font-bold text-white font-sans">Terms of Service</h3>
+          <p class="text-[11px] font-mono text-[#71717A]">Effective: September 2026 • Commercial Release</p>
+        </div>
+        <button onclick="closeLegalModal()" class="p-1.5 rounded-lg text-[#71717A] hover:text-white hover:bg-[#1E222D] transition-colors">
+          ✕
+        </button>
+      </div>
+      <div id="legalModalBody" class="max-h-[60vh] overflow-y-auto pr-1 space-y-3 leading-relaxed">
+        <!-- Injected via JavaScript -->
+      </div>
+      <div class="border-t border-[#232733] pt-4 flex justify-end">
+        <button onclick="closeLegalModal()" class="px-4 py-2 rounded-xl bg-[#A3E635] text-[#0C0E12] font-semibold text-xs hover:bg-[#B7F04E] transition-colors">
+          Accept & Close
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Global JavaScript Handlers -->
+  <script>
+    const LEGAL_CONTENT = {
+      terms: {
+        title: 'Terms of Service & Usage Agreement',
+        body: `
+          <h4 class="font-bold text-white mb-1">1. Processing Scope</h4>
+          <p class="mb-3">Aura Customizer provides automated 2D-to-3D surface perspective transformation and photometric displacement rendering. Uploaded user assets are processed in volatile memory pipelines for mockup synthesis.</p>
+          <h4 class="font-bold text-white mb-1">2. Output Warranties</h4>
+          <p class="mb-3">Rendered mockups represent digital simulations of physical screen printing and direct to garment techniques. Physical substrate color fidelity and ink absorption may vary depending on actual manufacturing hardware.</p>
+          <h4 class="font-bold text-white mb-1">3. Concurrency Limits</h4>
+          <p class="mb-3">High resolution rendering jobs above 2000px resolution are queued via Celery workers to preserve compute reliability. Rate limits apply to unauthenticated batch requests.</p>
+        `
+      },
+      privacy: {
+        title: 'Privacy Policy & Intellectual Property',
+        body: `
+          <h4 class="font-bold text-white mb-1">1. Artwork Ownership</h4>
+          <p class="mb-3">You retain full intellectual property ownership of all graphics, vector logos, and photography uploaded to this system. Aura does not claim copyright or usage rights over user submissions.</p>
+          <h4 class="font-bold text-white mb-1">2. Data Retention</h4>
+          <p class="mb-3">Anonymous session graphics and rendered preview files are stored in temporary scratch volumes. Registered user accounts retain mockup history in private encrypted object stores.</p>
+          <h4 class="font-bold text-white mb-1">3. Zero Data Brokering</h4>
+          <p class="mb-3">We never sell, rent, or trade your design files or customer data to third-party advertisers or model training datasets.</p>
+        `
+      },
+      commercial: {
+        title: 'Commercial Mockup License',
+        body: `
+          <h4 class="font-bold text-white mb-1">1. Commercial Distribution</h4>
+          <p class="mb-3">Mockups generated using Aura Customizer may be used in commercial e-commerce storefronts (Shopify, WooCommerce, Custom Portals) without additional royalty fees.</p>
+          <h4 class="font-bold text-white mb-1">2. Resale of Mockup Templates</h4>
+          <p class="mb-3">The underlying base photography, displacement maps, and perspective coordinate sets remain the proprietary property of Aura Technologies and cannot be extracted or resold as standalone digital templates.</p>
+        `
+      }
+    };
+
+    function openLegalModal(type) {
+      const data = LEGAL_CONTENT[type] || LEGAL_CONTENT.terms;
+      document.getElementById('legalModalTitle').innerText = data.title;
+      document.getElementById('legalModalBody').innerHTML = data.body;
+      const modal = document.getElementById('legalModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeLegalModal() {
+      const modal = document.getElementById('legalModal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+  </script>
+
+  {% block extra_scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,412 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ selected_product.name }} | Aura High-Performance Customizer{% endblock %}
+
+{% block content %}
+<div class="flex-1 flex flex-col max-w-[1600px] w-full mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 gap-6">
+  
+  <!-- Studio Header Strip -->
+  <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-[#232733] pb-4">
+    <div class="space-y-1">
+      <div class="flex items-center gap-2 text-xs font-mono text-[#A3E635]">
+        <span class="px-2 py-0.5 rounded bg-[#A3E635]/10 border border-[#A3E635]/30">OpenCV 4-Point Homography</span>
+        <span class="text-[#71717A]">•</span>
+        <span class="text-[#A1A1AA]">{{ selected_angle.customization_area.name }}</span>
+      </div>
+      <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-white font-sans flex items-center gap-3">
+        <span>{{ selected_product.name }}</span>
+        <span class="text-sm font-normal text-[#71717A] font-mono">({{ selected_product.color_name }})</span>
+      </h1>
+    </div>
+
+    <!-- Product & Angle Switcher Bar -->
+    <div class="flex flex-wrap items-center gap-2.5">
+      
+      <!-- Product Dropdown -->
+      <div class="relative">
+        <select id="productSelector" onchange="switchProduct(this.value)" class="appearance-none rounded-xl border border-[#2B3140] bg-[#141722] px-3.5 py-2 pr-9 text-xs font-semibold text-white focus:border-[#A3E635] focus:outline-none cursor-pointer">
+          {% for prod in products %}
+            <option value="{{ prod.slug }}" {% if prod.id == selected_product.id %}selected{% endif %}>
+              {{ prod.name }} (${{ prod.price }})
+            </option>
+          {% endfor %}
+        </select>
+        <div class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs text-[#71717A]">▼</div>
+      </div>
+
+      <!-- Angles Tab Pills -->
+      <div class="flex items-center rounded-xl border border-[#2B3140] bg-[#141722] p-1 gap-1">
+        {% for angle in selected_product.angles.all %}
+          <button
+            onclick="switchAngle({{ angle.id }})"
+            class="angle-tab-btn px-3 py-1.5 rounded-lg text-xs font-medium transition-colors {% if angle.id == selected_angle.id %}bg-[#242A38] text-white font-bold shadow-xs{% else %}text-[#8E93A0] hover:text-white hover:bg-[#1B202B]{% endif %}"
+            data-angle-id="{{ angle.id }}"
+          >
+            {{ angle.name }}
+          </button>
+        {% endfor %}
+      </div>
+
+      <!-- Full Catalog Link -->
+      <a href="{% url 'customizer:catalog' %}" class="p-2 rounded-xl border border-[#2B3140] bg-[#141722] text-[#8E93A0] hover:text-white hover:bg-[#1B202B] transition-colors" title="View Full Garment Catalog">
+        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"/></svg>
+      </a>
+
+    </div>
+  </div>
+
+  <!-- Studio Workstation Grid -->
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+    
+    <!-- LEFT & CENTER: Interactive Canvas Stage (7 cols on lg, 8 on xl) -->
+    <div class="lg:col-span-7 xl:col-span-8 flex flex-col gap-3">
+      
+      <div class="relative rounded-2xl border border-[#232733] bg-[#10121A] p-2 sm:p-4 shadow-xl overflow-hidden flex flex-col items-center justify-center min-h-[500px] sm:min-h-[640px]">
+        
+        <!-- Stage Overlay Floating Actions -->
+        <div class="absolute top-4 left-4 z-20 flex flex-wrap items-center gap-2">
+          <div class="px-2.5 py-1 rounded-lg bg-[#0C0E12]/80 backdrop-blur-md border border-[#2A2E3B] text-[11px] font-mono text-[#A1A1AA] flex items-center gap-1.5">
+            <span class="h-1.5 w-1.5 rounded-full bg-[#A3E635]"></span>
+            <span id="canvasCoordsIndicator">Interactive Surface</span>
+          </div>
+
+          <button onclick="centerArtwork()" class="px-2.5 py-1 rounded-lg bg-[#0C0E12]/80 backdrop-blur-md border border-[#2A2E3B] text-[11px] text-[#A1A1AA] hover:text-white hover:border-[#A3E635] transition-colors">
+            Center Graphic
+          </button>
+
+          <button onclick="fitArtworkToZone()" class="px-2.5 py-1 rounded-lg bg-[#0C0E12]/80 backdrop-blur-md border border-[#2A2E3B] text-[11px] text-[#A1A1AA] hover:text-white hover:border-[#A3E635] transition-colors">
+            Fit to Zone
+          </button>
+
+          <button onclick="togglePrintZoneOverlay()" id="btnToggleZone" class="px-2.5 py-1 rounded-lg bg-[#0C0E12]/80 backdrop-blur-md border border-[#2A2E3B] text-[11px] text-[#A1A1AA] hover:text-white transition-colors">
+            Toggle Print Box
+          </button>
+        </div>
+
+        <div class="absolute top-4 right-4 z-20 flex items-center gap-1.5">
+          <button onclick="resetTransformations()" class="px-2.5 py-1 rounded-lg bg-[#0C0E12]/80 backdrop-blur-md border border-[#2A2E3B] text-[11px] text-[#A1A1AA] hover:text-white transition-colors">
+            Reset
+          </button>
+        </div>
+
+        <!-- HTML5 Main Interactive Canvas -->
+        <div class="relative flex items-center justify-center w-full max-w-[620px] aspect-square">
+          <canvas id="customizerCanvas" class="w-full h-full rounded-xl shadow-2xl cursor-grab active:cursor-grabbing touch-none select-none"></canvas>
+          
+          <!-- Loading Overlay -->
+          <div id="canvasLoadingOverlay" class="absolute inset-0 bg-[#0C0E12]/70 backdrop-blur-xs flex flex-col items-center justify-center gap-2 rounded-xl transition-opacity">
+            <div class="h-8 w-8 rounded-full border-2 border-[#A3E635] border-t-transparent animate-spin"></div>
+            <p class="text-xs font-mono text-[#A3E635]">Loading High-Res Substrate...</p>
+          </div>
+        </div>
+
+        <!-- Canvas Interaction Helper Footer -->
+        <div class="w-full mt-3 pt-3 border-t border-[#1C202B] flex flex-wrap items-center justify-between gap-2 text-[11px] font-mono text-[#71717A]">
+          <span class="flex items-center gap-1.5">
+            <kbd class="px-1.5 py-0.5 rounded bg-[#1B202B] border border-[#2E3545] text-white">Drag</kbd> Reposition
+            <span class="mx-1">•</span>
+            <kbd class="px-1.5 py-0.5 rounded bg-[#1B202B] border border-[#2E3545] text-white">Wheel</kbd> Scale
+          </span>
+          <span class="text-[#A1A1AA]">Physical Bed: <strong class="text-white">{{ selected_angle.customization_area.max_width_mm }} x {{ selected_angle.customization_area.max_height_mm }} mm</strong></span>
+        </div>
+
+      </div>
+
+      <!-- Realtime Asynchronous Pipeline Monitor Card -->
+      <div id="renderProgressCard" class="hidden rounded-2xl border border-[#2E384D] bg-[#121622] p-5 shadow-xl space-y-4 animate-in fade-in duration-200">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2.5">
+            <div class="h-3 w-3 rounded-full bg-[#A3E635] animate-ping"></div>
+            <h3 class="text-sm font-bold text-white font-mono">OpenCV Rendering Pipeline</h3>
+          </div>
+          <span id="jobProgressPct" class="text-sm font-bold text-[#A3E635] font-mono">0%</span>
+        </div>
+
+        <!-- Progress Bar Track -->
+        <div class="h-2 w-full rounded-full bg-[#1A1F2D] overflow-hidden">
+          <div id="jobProgressBar" class="h-full bg-gradient-to-r from-[#A3E635] to-[#10B981] transition-all duration-300 w-0"></div>
+        </div>
+
+        <div class="flex items-center justify-between text-xs text-[#8C92A0] font-mono">
+          <span id="jobStatusMsg">Submitting job payload...</span>
+          <span id="jobTimer">0.0s</span>
+        </div>
+      </div>
+
+      <!-- Rendered Mockup Showcase Card -->
+      <div id="renderResultCard" class="hidden rounded-2xl border border-[#2E384D] bg-[#121622] p-5 shadow-xl space-y-4 animate-in zoom-in-95 duration-200">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#202738] pb-3">
+          <div class="flex items-center gap-2">
+            <span class="px-2 py-0.5 rounded bg-[#10B981]/20 text-[#10B981] font-mono text-[11px] font-bold">SUCCESS</span>
+            <h3 class="text-sm font-bold text-white">Photorealistic 2400px Conformed Mockup</h3>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <button onclick="toggleCompareMode()" id="btnCompare" class="px-2.5 py-1.5 rounded-lg border border-[#2B3140] bg-[#181D29] text-xs font-medium text-[#A1A1AA] hover:text-white transition-colors">
+              Compare Flat vs Folds
+            </button>
+            <a id="btnDownloadMockup" href="#" download="aura_custom_mockup.jpg" class="px-3 py-1.5 rounded-lg bg-[#A3E635] hover:bg-[#B7F04E] text-[#0C0E12] font-bold text-xs flex items-center gap-1.5 shadow-sm transition-all">
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+              <span>Download 2400px JPG</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Side-by-Side or Full Preview -->
+        <div class="relative rounded-xl overflow-hidden bg-black/40 flex items-center justify-center">
+          <img id="renderedMockupImg" src="" alt="Photorealistic Mockup Render" class="w-full max-h-[600px] object-contain rounded-xl cursor-zoom-in" onclick="openZoomModal(this.src)">
+        </div>
+
+        <div class="flex flex-wrap items-center justify-between gap-2 text-[11px] font-mono text-[#71717A] pt-2">
+          <span id="renderedStats">Execution: 0.28s | Resolution: 2400 x 2400px</span>
+          <span>Bicubic Remap + Photometric Multiply</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT: Studio Control Sidebar (5 cols on lg, 4 on xl) -->
+    <div class="lg:col-span-5 xl:col-span-4 flex flex-col gap-4">
+      
+      <!-- Section 1: Artwork Selection -->
+      <div class="rounded-2xl border border-[#232733] bg-[#12151E] p-5 shadow-xl space-y-4">
+        <div class="flex items-center justify-between border-b border-[#1E232E] pb-3">
+          <h2 class="text-sm font-bold uppercase tracking-wider text-white font-sans flex items-center gap-2">
+            <span>1. Artwork Input</span>
+          </h2>
+          <span class="text-[11px] font-mono text-[#71717A]">PNG, JPG, WebP</span>
+        </div>
+
+        <!-- Drag and drop zone -->
+        <div
+          id="dropZone"
+          onclick="document.getElementById('designFileInput').click()"
+          class="relative rounded-xl border-2 border-dashed border-[#2B3242] hover:border-[#A3E635] bg-[#151924] hover:bg-[#181D2B] p-5 text-center transition-colors cursor-pointer group"
+        >
+          <input type="file" id="designFileInput" accept="image/png, image/jpeg, image/webp" class="hidden" onchange="handleFileInput(this.files[0])">
+          
+          <div class="flex flex-col items-center gap-2">
+            <div class="h-10 w-10 rounded-xl bg-[#1D2333] border border-[#2E384D] flex items-center justify-center text-[#A3E635] group-hover:scale-110 transition-transform">
+              <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+            </div>
+            <div>
+              <p class="text-xs font-semibold text-white">Click or Drag Artwork File</p>
+              <p class="text-[11px] text-[#71717A] mt-0.5">High-resolution transparent PNG recommended</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Preset Samples Gallery -->
+        <div class="space-y-2">
+          <div class="flex items-center justify-between text-xs text-[#8E93A0]">
+            <span>Or choose instant test artwork:</span>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2">
+            {% for preset in presets %}
+              <button
+                onclick="selectPresetArtwork({{ preset.id }}, '{{ preset.image.url }}', '{{ preset.title|escapejs }}')"
+                class="preset-btn flex items-center gap-2 p-2 rounded-xl border border-[#232733] bg-[#161A24] hover:border-[#A3E635] text-left transition-all group"
+                data-preset-id="{{ preset.id }}"
+              >
+                <img src="{{ preset.image.url }}" alt="{{ preset.title }}" class="h-8 w-8 rounded-lg object-contain bg-black/40 border border-[#232733] shrink-0">
+                <div class="truncate">
+                  <p class="text-xs font-medium text-white truncate group-hover:text-[#A3E635] transition-colors">{{ preset.title }}</p>
+                  <p class="text-[10px] text-[#71717A] font-mono capitalize">{{ preset.category }}</p>
+                </div>
+              </button>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- Active Design Indicator -->
+        <div id="activeDesignBadge" class="hidden items-center justify-between p-2.5 rounded-xl border border-[#2E384D] bg-[#161B26]">
+          <div class="flex items-center gap-2.5 truncate">
+            <img id="activeDesignThumb" src="" alt="Thumbnail" class="h-7 w-7 rounded-lg object-contain bg-black/50 border border-[#2B3242]">
+            <div class="truncate">
+              <p id="activeDesignTitle" class="text-xs font-bold text-white truncate">Artwork Loaded</p>
+              <p id="activeDesignDims" class="text-[10px] font-mono text-[#71717A]">1000 x 1000 px</p>
+            </div>
+          </div>
+          <span class="text-[10px] font-mono text-[#A3E635] px-2 py-0.5 rounded bg-[#A3E635]/10 border border-[#A3E635]/30 shrink-0">Ready</span>
+        </div>
+
+      </div>
+
+      <!-- Section 2: Geometry & Deformation Tuning -->
+      <div class="rounded-2xl border border-[#232733] bg-[#12151E] p-5 shadow-xl space-y-4">
+        <div class="flex items-center justify-between border-b border-[#1E232E] pb-3">
+          <h2 class="text-sm font-bold uppercase tracking-wider text-white font-sans flex items-center gap-2">
+            <span>2. Conformation Tuning</span>
+          </h2>
+          <span class="text-[11px] font-mono text-[#71717A]">Realtime</span>
+        </div>
+
+        <!-- Scale slider -->
+        <div class="space-y-1.5">
+          <div class="flex items-center justify-between text-xs">
+            <label for="scaleSlider" class="text-[#A1A1AA] font-medium">Graphic Scale</label>
+            <span id="scaleValueDisplay" class="font-mono text-white text-xs font-bold">100%</span>
+          </div>
+          <input type="range" id="scaleSlider" min="20" max="220" value="100" class="w-full accent-[#A3E635] cursor-pointer" oninput="updateScale(this.value)">
+        </div>
+
+        <!-- Rotation slider -->
+        <div class="space-y-1.5">
+          <div class="flex items-center justify-between text-xs">
+            <label for="rotationSlider" class="text-[#A1A1AA] font-medium">Surface Rotation</label>
+            <span id="rotationValueDisplay" class="font-mono text-white text-xs font-bold">0°</span>
+          </div>
+          <input type="range" id="rotationSlider" min="-180" max="180" value="0" class="w-full accent-[#A3E635] cursor-pointer" oninput="updateRotation(this.value)">
+        </div>
+
+        <!-- Blend Mode selector -->
+        <div class="space-y-1.5">
+          <div class="flex items-center justify-between text-xs">
+            <label for="blendModeSelector" class="text-[#A1A1AA] font-medium">Photometric Ink Transfer</label>
+            <span class="text-[10px] font-mono text-[#71717A]">Fabric Pass</span>
+          </div>
+          <select id="blendModeSelector" onchange="updateBlendMode(this.value)" class="w-full rounded-xl border border-[#2B3140] bg-[#161B26] px-3 py-2 text-xs font-semibold text-white focus:border-[#A3E635] focus:outline-none cursor-pointer">
+            <option value="MULTIPLY" selected>Multiply (Authentic Screen Print Shadows)</option>
+            <option value="OVERLAY">Overlay (High Contrast Graphic Transfer)</option>
+            <option value="SOFT_LIGHT">Soft Light (Subtle Vintage Handfeel)</option>
+            <option value="NORMAL">Normal (Direct Opaque Deposit)</option>
+          </select>
+        </div>
+
+        <!-- Fabric Displacement Intensity -->
+        <div class="space-y-1.5">
+          <div class="flex items-center justify-between text-xs">
+            <label for="displacementSlider" class="text-[#A1A1AA] font-medium">Fold Conformation Displacement</label>
+            <span id="dispValueDisplay" class="font-mono text-[#A3E635] text-xs font-bold">18 px</span>
+          </div>
+          <input type="range" id="displacementSlider" min="0" max="36" value="18" class="w-full accent-[#A3E635] cursor-pointer" oninput="updateDisplacement(this.value)">
+          <p class="text-[11px] text-[#71717A]">Calculates pixel displacement vectors from underlying fabric contours</p>
+        </div>
+
+      </div>
+
+      <!-- Section 3: High-Res Render Trigger -->
+      <div class="rounded-2xl border border-[#232733] bg-[#12151E] p-5 shadow-xl space-y-3">
+        <button
+          id="btnExecuteRender"
+          onclick="triggerHighResRender()"
+          class="w-full py-4 rounded-xl bg-[#A3E635] hover:bg-[#B7F04E] text-[#0C0E12] font-bold text-sm tracking-tight flex items-center justify-center gap-2 shadow-lg shadow-[#A3E635]/15 transition-all transform active:scale-98 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <span id="btnRenderSpinner" class="hidden h-4 w-4 rounded-full border-2 border-[#0C0E12] border-t-transparent animate-spin"></span>
+          <span id="btnRenderText">⚡ Render Photorealistic 2400px Mockup</span>
+        </button>
+
+        <div class="flex items-center justify-between text-[11px] font-mono text-[#71717A] px-1">
+          <span>Concurrency: Celery Distributed Worker</span>
+          <span>Quality: 95% JPEG</span>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- Computer Vision Engineering Specifications Anchor Section -->
+  <section id="pipeline-specs" class="mt-12 pt-12 border-t border-[#232733] space-y-8">
+    <div class="max-w-3xl space-y-2">
+      <div class="inline-flex items-center gap-2 text-xs font-mono text-[#A3E635]">
+        <span class="h-2 w-2 rounded-full bg-[#A3E635]"></span>
+        <span>IMAGE PROCESSING ARCHITECTURE</span>
+      </div>
+      <h2 class="text-2xl sm:text-3xl font-bold tracking-tight text-white font-sans">
+        Sub-Pixel Homography & Automatic Displacement Mapping
+      </h2>
+      <p class="text-sm text-[#8C909A] leading-relaxed">
+        Commercial product customization cannot simply paste flat graphic stickers over photos. Aura's computational pipeline mathematically warps, conforms, and photometrically blends inks into physical textiles.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      
+      <div class="rounded-2xl border border-[#232733] bg-[#12151D] p-5 space-y-2.5">
+        <div class="h-8 w-8 rounded-lg bg-[#191D28] border border-[#2B3140] flex items-center justify-center font-mono text-sm font-bold text-[#A3E635]">
+          01
+        </div>
+        <h3 class="text-sm font-bold text-white">4-Point Perspective Homography</h3>
+        <p class="text-xs text-[#71717A] leading-relaxed">
+          OpenCV calculates a 3x3 perspective homography matrix using target surface coordinates. Lanczos-4 interpolation prevents edge distortion and keeps vector graphics razor-sharp.
+        </p>
+      </div>
+
+      <div class="rounded-2xl border border-[#232733] bg-[#12151D] p-5 space-y-2.5">
+        <div class="h-8 w-8 rounded-lg bg-[#191D28] border border-[#2B3140] flex items-center justify-center font-mono text-sm font-bold text-[#A3E635]">
+          02
+        </div>
+        <h3 class="text-sm font-bold text-white">Sobel Surface Normal Extraction</h3>
+        <p class="text-xs text-[#71717A] leading-relaxed">
+          The base garment's perceptual lightness channel is filtered through high-pass and Sobel 5x5 kernel operators to construct directional fold displacement vectors (dx, dy).
+        </p>
+      </div>
+
+      <div class="rounded-2xl border border-[#232733] bg-[#12151D] p-5 space-y-2.5">
+        <div class="h-8 w-8 rounded-lg bg-[#191D28] border border-[#2B3140] flex items-center justify-center font-mono text-sm font-bold text-[#A3E635]">
+          03
+        </div>
+        <h3 class="text-sm font-bold text-white">Bicubic Remap Conformation</h3>
+        <p class="text-xs text-[#71717A] leading-relaxed">
+          Pixel coordinates are displaced non-linearly across the garment curvature using OpenCV remap. Graphics realistically distort along wrinkles instead of floating rigidly.
+        </p>
+      </div>
+
+      <div class="rounded-2xl border border-[#232733] bg-[#12151D] p-5 space-y-2.5">
+        <div class="h-8 w-8 rounded-lg bg-[#191D28] border border-[#2B3140] flex items-center justify-center font-mono text-sm font-bold text-[#A3E635]">
+          04
+        </div>
+        <h3 class="text-sm font-bold text-white">Photometric Shading Modulation</h3>
+        <p class="text-xs text-[#71717A] leading-relaxed">
+          The underlying fabric's highlights and shadow crevices modulate the ink's RGB channels via Multiply/Overlay blending, allowing natural lighting to pass cleanly through the print.
+        </p>
+      </div>
+
+    </div>
+  </section>
+
+</div>
+
+<!-- Fullscreen Zoom Modal -->
+<div id="zoomModal" class="fixed inset-0 z-50 hidden items-center justify-center p-2 sm:p-6 overflow-hidden" role="dialog">
+  <div onclick="closeZoomModal()" class="fixed inset-0 bg-black/90 backdrop-blur-md"></div>
+  <div class="relative max-w-5xl w-full max-h-[95vh] rounded-2xl border border-[#2B3140] bg-[#12151E] p-2 sm:p-4 z-10 flex flex-col items-center">
+    <div class="w-full flex items-center justify-between pb-2 px-2 text-xs text-[#8E93A0]">
+      <span class="font-mono">High Resolution 2400x2400 Studio Output</span>
+      <button onclick="closeZoomModal()" class="p-1 rounded hover:text-white">✕ Close</button>
+    </div>
+    <div class="overflow-auto w-full flex items-center justify-center max-h-[82vh]">
+      <img id="zoomModalImg" src="" alt="High Res Mockup Fullscreen" class="max-w-full max-h-full object-contain rounded-lg">
+    </div>
+  </div>
+</div>
+
+<!-- Dynamic Studio State Serialized for JS Engine -->
+<script>
+  window.AURA_CONFIG = {
+    productId: {{ selected_product.id }},
+    productSlug: '{{ selected_product.slug }}',
+    angleId: {{ selected_angle.id }},
+    angleType: '{{ selected_angle.angle_type }}',
+    baseImageUrl: '{{ selected_angle.base_image.url }}',
+    customArea: {
+      name: '{{ selected_angle.customization_area.name|escapejs }}',
+      maxWidthMm: {{ selected_angle.customization_area.max_width_mm }},
+      maxHeightMm: {{ selected_angle.customization_area.max_height_mm }},
+      boundingLeft: {{ selected_angle.customization_area.bounding_left_pct }},
+      boundingTop: {{ selected_angle.customization_area.bounding_top_pct }},
+      boundingWidth: {{ selected_angle.customization_area.bounding_width_pct }},
+      boundingHeight: {{ selected_angle.customization_area.bounding_height_pct }},
+      quadPoints: {{ selected_angle.customization_area.quad_points_json|safe }},
+      blendMode: '{{ selected_angle.customization_area.blend_mode }}',
+      displacementStrength: {{ selected_angle.customization_area.displacement_strength }},
+    }
+  };
+</script>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="/static/js/studio.js"></script>
+{% endblock %}

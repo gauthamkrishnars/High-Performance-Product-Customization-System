@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block title %}Garment & Substrate Catalog | Aura Customizer{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
+  
+  <!-- Catalog Title Header -->
+  <div class="border-b border-[#232733] pb-6 space-y-2">
+    <div class="inline-flex items-center gap-2 text-xs font-mono text-[#A3E635]">
+      <span class="h-2 w-2 rounded-full bg-[#A3E635]"></span>
+      <span>PRODUCTION SUBSTRATES & PRINT BEDS</span>
+    </div>
+    <h1 class="text-3xl sm:text-4xl font-bold tracking-tight text-white font-sans">
+      Garment & Apparel Catalog
+    </h1>
+    <p class="text-sm text-[#8E93A0] max-w-2xl leading-relaxed">
+      Engineered base products calibrated with 4-point homography and high-density surface displacement fields.
+    </p>
+  </div>
+
+  <!-- Product Grid -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {% for product in products %}
+      <div class="rounded-2xl border border-[#232733] bg-[#12151E] overflow-hidden shadow-xl hover:border-[#2E374A] transition-all flex flex-col justify-between group">
+        
+        <!-- Thumbnail & Angles Ribbon -->
+        <div class="relative bg-[#181B26] p-4 flex items-center justify-center min-h-[260px]">
+          <img src="{{ product.default_angle.base_image.url }}" alt="{{ product.name }}" class="max-h-[240px] w-auto object-contain group-hover:scale-105 transition-transform duration-300">
+          
+          <div class="absolute bottom-3 left-3 flex gap-1">
+            {% for angle in product.angles.all %}
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-[#0C0E12]/80 backdrop-blur-sm border border-[#2A2E3B] text-[#A1A1AA]">
+                {{ angle.get_angle_type_display }}
+              </span>
+            {% endfor %}
+          </div>
+
+          <div class="absolute top-3 right-3 text-xs font-mono font-bold text-[#A3E635] px-2.5 py-1 rounded-lg bg-[#0C0E12]/80 backdrop-blur-sm border border-[#2A2E3B]">
+            ${{ product.price }}
+          </div>
+        </div>
+
+        <!-- Product Specs Body -->
+        <div class="p-6 space-y-4 flex-1 flex flex-col justify-between">
+          <div class="space-y-2">
+            <h2 class="text-lg font-bold text-white font-sans">{{ product.name }}</h2>
+            <p class="text-xs text-[#8E93A0] leading-relaxed line-clamp-2">{{ product.description }}</p>
+            
+            <div class="pt-2 border-t border-[#1C202B] space-y-1.5 text-xs text-[#71717A]">
+              <div class="flex items-center justify-between">
+                <span>Colorway:</span>
+                <span class="font-medium text-white">{{ product.color_name }}</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <span>Fabric Weight:</span>
+                <span class="font-medium text-white">{{ product.material }}</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <span>Print Angles:</span>
+                <span class="font-mono text-[#A3E635]">{{ product.angles.count }} Angles Configured</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="pt-4">
+            <a href="{% url 'customizer:studio' %}?product={{ product.slug }}" class="w-full py-2.5 rounded-xl bg-[#222838] hover:bg-[#A3E635] text-white hover:text-[#0C0E12] font-semibold text-xs tracking-tight flex items-center justify-center gap-2 transition-colors">
+              <span>Open in Customizer Studio</span>
+              <span>→</span>
+            </a>
+          </div>
+        </div>
+
+      </div>
+    {% endfor %}
+  </div>
+
+</div>
+{% endblock %}

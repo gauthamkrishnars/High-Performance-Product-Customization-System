@@ -1,0 +1,108 @@
+/* Aura High-Performance Customizer Stylesheet */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-main: #0C0E12;
+  --bg-surface: #12151E;
+  --bg-elevated: #181D29;
+  --border-subtle: #232733;
+  --border-focus: #2E384D;
+  --accent-lime: #A3E635;
+  --accent-lime-hover: #B7F04E;
+  --text-primary: #FFFFFF;
+  --text-muted: #8C92A0;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0C0E12;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #232733;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #323849;
+}
+
+/* Range input customization */
+input[type="range"] {
+  -webkit-appearance: none;
+  background: #1C212E;
+  height: 6px;
+  border-radius: 9999px;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  height: 16px;
+  width: 16px;
+  border-radius: 50%;
+  background: #A3E635;
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(163, 230, 53, 0.4);
+  transition: transform 0.1s ease;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+/* Animated Shimmer for Loaders */
+@keyframes auraShimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.aura-skeleton {
+  background: linear-gradient(90deg, #161A24 25%, #222838 50%, #161A24 75%);
+  background-size: 200% 100%;
+  animation: auraShimmer 1.8s infinite;
+}
+
+/* Canvas Crosshair Grid */
+.canvas-grid-bg {
+  background-image: radial-gradient(#202533 1px, transparent 1px);
+  background-size: 16px 16px;
+}
+
+/* Drag over highlight */
+.drag-active {
+  border-color: #A3E635 !important;
+  background-color: rgba(163, 230, 53, 0.08) !important;
+}
+
+/* Utility Animations */
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(163, 230, 53, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(163, 230, 53, 0);
+  }
+}
+
+.pulse-glow {
+  animation: pulseGlow 2s infinite;
+}
+
+/* Responsive fixes down to 320px */
+@media (max-width: 640px) {
+  select, input, button {
+    font-size: 14px !important;
+  }
+}
